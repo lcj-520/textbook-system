@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>高校教材与教材采购管理系统</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/element-plus/dist/index.css" />
+    <script src="https://unpkg.com/element-plus"></script>
+    <script src="https://unpkg.com/@element-plus/icons-vue"></script>
+    <script src="/static/echarts.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', 'Microsoft YaHei', sans-serif; }
+        body { height: 100vh; overflow: hidden; background-color: #F5F7FA; }
+
+        /* ================= 登录页 ================= */
+        .login-container { height: 100vh; display: flex; justify-content: center; align-items: center; background: linear-gradient(135deg, #FFF3E0 0%, #E3F2FD 100%); position: relative; overflow: hidden; }
+        .floating-icon { position: absolute; opacity: 0.6; font-size: 24px; animation: float 6s ease-in-out infinite; }
+        .icon-1 { top: 15%; left: 20%; animation-delay: 0s; font-size: 40px;}
+        .icon-2 { top: 25%; right: 15%; animation-delay: 1s; }
+        .icon-3 { bottom: 25%; left: 25%; animation-delay: 2s; font-size: 36px;}
+        .icon-4 { bottom: 15%; right: 20%; animation-delay: 3s; }
+        @keyframes float { 0% { transform: translateY(0px) rotate(0deg); } 50% { transform: translateY(-15px) rotate(5deg); } 100% { transform: translateY(0px) rotate(0deg); } }
+
+        .login-card { display: flex; width: 900px; height: 500px; background: #FFFFFF; border-radius: 24px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08); overflow: hidden; z-index: 10; }
+        .login-left { width: 40%; background: linear-gradient(135deg, #FFE0B2 0%, #FFCC80 100%); padding: 50px 40px; display: flex; flex-direction: column; position: relative; }
+        .logo-box { width: 56px; height: 56px; background: #F59E0B; border-radius: 16px; display: flex; justify-content: center; align-items: center; color: white; font-size: 28px; margin-bottom: 20px; box-shadow: 0 8px 20px rgba(245, 158, 11, 0.3); }
+        .left-title { font-size: 26px; font-weight: 800; color: #111827; margin-bottom: 8px; }
+        .left-desc { font-size: 14px; color: #6B7280; margin-bottom: 40px; }
+        .feature-item { display: flex; align-items: center; gap: 10px; background: rgba(255, 255, 255, 0.5); padding: 12px 16px; border-radius: 12px; margin-bottom: 16px; font-size: 14px; color: #4B5563; font-weight: 500; }
+        .feature-item i { color: #F59E0B; font-size: 16px; }
+
+        .login-right { width: 60%; padding: 60px 80px; display: flex; flex-direction: column; justify-content: center; }
+        .right-title { font-size: 28px; font-weight: 800; color: #111827; margin-bottom: 8px; }
+        .right-desc { font-size: 14px; color: #9CA3AF; margin-bottom: 30px; }
+        .el-input__wrapper { border-radius: 8px !important; box-shadow: 0 0 0 1px #E5E7EB inset !important; padding: 8px 15px; }
+        .el-input__wrapper.is-focus { box-shadow: 0 0 0 1px #F59E0B inset !important; }
+        .login-btn { width: 100%; height: 50px; background: #F59E0B; border: none; border-radius: 8px; color: white; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 10px;}
+        .login-btn:hover { background: #D97706; }
+
+        /* ================= 主系统布局 ================= */
+        .app-layout { display: flex; height: 100vh; padding: 20px; gap: 20px; background: #F4F6F8; }
+        .sidebar { width: 240px; background: #FFFFFF; border-radius: 24px; display: flex; flex-direction: column; padding: 24px 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.02); }
+        
+        /* 修复左侧标题换行问题 */
+        .logo-area { font-size: 26px; font-weight: 900; display: flex; align-items: center; gap: 8px; margin-bottom: 30px; padding-left: 5px; color: #111827; letter-spacing: -1px; margin-top: -10px; white-space: nowrap; }
+        
+        .el-menu { border-right: none; background: transparent !important; flex: 1; margin-top: 10px;}
+        .el-menu-item { color: #64748B; margin-bottom: 8px; border-radius: 12px; font-weight: 500; height: 50px; line-height: 50px; transition: all 0.3s; padding-left: 20px !important; }
+        .el-menu-item:hover { background: #F1F5F9 !important; color: #111827; }
+        .el-menu-item.is-active { background: #ECFDF5 !important; color: #10B981 !important; font-weight: 700; border-right: 4px solid #10B981; }
+        .el-menu-item .el-icon { margin-right: 12px; font-size: 18px; }
+
+        .main-content { flex: 1; display: flex; flex-direction: column; overflow-y: auto; padding-right: 10px; }
+        .top-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 24px; padding: 0 10px; }
+        .page-title { font-size: 32px; font-weight: 800; color: #111827; margin-top: 20px; }
+        
+        .header-actions { display: flex; align-items: center; }
+        .avatar-dropdown { display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 6px 12px; background: #FFFFFF; border-radius: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.03); transition: 0.2s; }
+        .avatar-dropdown:hover { background: #F8FAFC; }
+        .avatar-dropdown img { width: 36px; height: 36px; border-radius: 50%; background: #E2E8F0; }
+        .avatar-dropdown span { font-size: 14px; font-weight: 600; color: #111827; }
+        .dropdown-item-logout { color: #EF4444; font-weight: 600; }
+
+        .card-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 24px; }
+        .glass-card { padding: 24px; border-radius: 24px; background: #FFFFFF; box-shadow: 0 4px 20px rgba(0,0,0,0.02); display: flex; flex-direction: column; justify-content: center; height: 120px; border: 1px solid #F8FAFC; }
+        .card-title { font-size: 15px; color: #64748B; font-weight: 500; margin-bottom: 8px; }
+        .card-value { font-size: 36px; font-weight: 800; color: #111827; }
+        .card-green { background: #F0FDF4; border: none; }
+        .card-green .card-value { color: #10B981; }
+        .card-orange { background: #FFF7ED; border: none; }
+        .card-orange .card-value { color: #F59E0B; }
+
+        .content-card { background: #FFFFFF; padding: 24px; border-radius: 24px; box-shadow: 0 4px 20px rgba(0,0,0,0.02); margin-bottom: 24px; border: 1px solid #F8FAFC; }
+        
+        .el-table { --el-table-border-color: transparent; background: transparent !important; }
+        .el-table th.el-table__cell { background: #FFFFFF !important; color: #94A3B8; font-weight: 600; font-size: 13px; border-bottom: 1px solid #F1F5F9; padding: 12px 0;}
+        .el-table td.el-table__cell { padding: 14px 0; border-bottom: 1px solid #F1F5F9; color: #334155; font-weight: 500;}
+        
+        .el-input__wrapper { border-radius: 12px !important; box-shadow: 0 0 0 1px #E2E8F0 inset !important; }
+        .el-select__wrapper { border-radius: 12px !important; box-shadow: 0 0 0 1px #E2E8F0 inset !important; }
+        .el-input-number { border-radius: 12px !important; border: none !important; box-shadow: 0 0 0 1px #E2E8F0 inset !important; }
+        ::-webkit-scrollbar { width: 0px; }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <!-- 登录页 -->
+        <div v-if="!isLogin" class="login-container">
+            <div class="floating-icon icon-1">📚</div>
+            <div class="floating-icon icon-2">📦</div>
+            <div class="floating-icon icon-3">🎓</div>
+            <div class="floating-icon icon-4">📝</div>
+
+            <div class="login-card">
+                <div class="login-left">
+                    <div class="logo-box">🌿</div>
+                    <div class="left-title">高校教材与教材采购管理系统</div>
+                    <div class="left-desc">智慧校园 · 极简调度 · 高效管理</div>
+                    <div class="feature-item"><el-icon><CircleCheck /></el-icon> 教材档案、库存情况一览无余</div>
+                    <div class="feature-item"><el-icon><CircleCheck /></el-icon> 一键征订采购，多方数据协同</div>
+                    <div class="feature-item"><el-icon><CircleCheck /></el-icon> 实时订单追踪，退订事务无忧</div>
+                </div>
+                <div class="login-right">
+                    <div class="right-title">欢迎登录</div>
+                    <div class="right-desc">请输入您的管理员账号和密码</div>
+                    <el-form :model="loginForm">
+                        <el-form-item><el-input v-model="loginForm.username" placeholder="账号" size="large" prefix-icon="User"></el-input></el-form-item>
+                        <el-form-item><el-input v-model="loginForm.password" type="password" placeholder="密码" size="large" prefix-icon="Lock" show-password @keyup.enter="doLogin"></el-input></el-form-item>
+                        <button class="login-btn" @click.prevent="doLogin">登 录</button>
+                    </el-form>
+                </div>
+            </div>
+        </div>
+
+        <!-- 主系统 -->
+        <div v-else class="app-layout">
+            <div class="sidebar">
+                <div class="logo-area">🌿 教材采购中枢</div>
+                <el-menu default-active="dashboard">
+                    <el-menu-item index="dashboard" @click="switchMenu('dashboard')"><el-icon><Odometer /></el-icon> 业务概览</el-menu-item>
+                    <el-menu-item index="books" @click="switchMenu('books')"><el-icon><Document /></el-icon> 教材档案</el-menu-item>
+                    <el-menu-item index="order" @click="switchMenu('order')"><el-icon><List /></el-icon> 征订管理</el-menu-item>
+                    <el-menu-item index="purchase" @click="switchMenu('purchase')"><el-icon><ShoppingCart /></el-icon> 采购入库</el-menu-item>
+                    <el-menu-item index="issue" @click="switchMenu('issue')"><el-icon><Box /></el-icon> 发放与退订</el-menu-item>
+                    <el-menu-item index="stats" @click="switchMenu('stats')"><el-icon><PieChart /></el-icon> 数据报表</el-menu-item>
+                </el-menu>
+            </div>
+
+            <div class="main-content">
+                <div class="top-header">
+                    <div class="page-title">
+                        {{ activeMenu === 'dashboard' ? '业务概览' : 
+                           activeMenu === 'books' ? '教材档案管理' : 
+                           activeMenu === 'order' ? '征订与结算' : 
+                           activeMenu === 'purchase' ? '采购入库台账' : 
+                           activeMenu === 'issue' ? '发放与退订' : '数据报表' }}
+                    </div>
+                    <div class="header-actions">
+                        <el-dropdown trigger="click" @command="handleCommand">
+                            <div class="avatar-dropdown">
+                                <img src="https://api.dicebear.com/7.x/notionists/svg?seed=Felix&backgroundColor=e2e8f0" alt="user">
+                                <span>管理员 lcj</span>
+                                <el-icon style="color: #94A3B8; margin-left: 4px;"><ArrowDown /></el-icon>
+                            </div>
+                            <template #dropdown>
+                                <el-dropdown-menu style="border-radius: 12px;">
+                                    <el-dropdown-item command="logout" class="dropdown-item-logout">
+                                        <el-icon><SwitchButton /></el-icon> 退出系统
+                                    </el-dropdown-item>
+                                </el-dropdown-menu>
+                            </template>
+                        </el-dropdown>
+                    </div>
+                </div>
+
+                <!-- 1. 看板 -->
+                <div v-show="activeMenu === 'dashboard'">
+                    <div class="card-grid">
+                        <div class="glass-card">
+                            <div class="card-title"><el-icon><Document /></el-icon> 在库教材种类</div>
+                            <div class="card-value">{{ bookList.length }} <span style="font-size: 16px; color: #94A3B8; font-weight: 500;">种</span></div>
+                        </div>
+                        <div class="glass-card card-orange">
+                            <div class="card-title"><el-icon><Warning /></el-icon> 库存告急预警</div>
+                            <div class="card-value">{{ warningList.length }} <span style="font-size: 16px; font-weight: 500;">本</span></div>
+                        </div>
+                        <div class="glass-card card-green">
+                            <div class="card-title"><el-icon><CircleCheck /></el-icon> 系统运行状态</div>
+                            <div class="card-value" style="font-size: 28px;">一切正常</div>
+                        </div>
+                    </div>
+                    
+                    <el-row :gutter="24" style="margin-bottom: 24px;">
+                        <el-col :span="14">
+                            <div class="content-card" style="height: 360px; margin-bottom: 0;">
+                                <h3 style="margin-bottom: 15px; font-size: 16px; font-weight: 700;">📈 采购入库趋势</h3>
+                                <div id="lineChart" style="width: 100%; height: 280px;"></div>
+                            </div>
+                        </el-col>
+                        <el-col :span="10">
+                            <div class="content-card" style="height: 360px; margin-bottom: 0; display: flex; flex-direction: column;">
+                                <h3 style="font-size: 16px; font-weight: 700;">🍩 学院经费占比</h3>
+                                <div id="pieChart" style="width: 100%; flex: 1;"></div>
+                            </div>
+                        </el-col>
+                    </el-row>
+
+                    <div class="content-card" style="margin-bottom: 24px;">
+                        <h3 style="margin-bottom: 15px; font-size: 16px; font-weight: 700; color: #EF4444;">⚠️ 紧急缺货清单</h3>
+                        <el-table :data="warningList">
+                            <el-table-column prop="book_name" label="教材名称"></el-table-column>
+                            <el-table-column prop="stock" label="剩余库存">
+                                <template #default="scope">
+                                    <el-tag type="danger" effect="light" style="border-radius: 6px; border: none; font-weight: bold;">{{ scope.row.stock }} 本</el-tag>
+                                </template>
+                            </el-table-column>
+                            <el-table-column label="操作" width="120">
+                                <template #default>
+                                    <el-button size="small" type="primary" link>立即采购</el-button>
+                                </template>
+                            </el-table-column>
+                        </el-table>
+                    </div>
+
+                    <!-- 日志部分 -->
+                    <div class="content-card">
+                        <h3 style="margin-bottom: 15px; font-size: 16px; font-weight: 700;">📝 关键业务操作日志 (事务留痕)</h3>
+                        <el-table :data="logList">
+                            <el-table-column prop="动作" label="操作动作" width="150">
+                                <template #default="scope">
+                                    <el-tag :type="scope.row.动作.includes('退') ? 'danger' : 'success'" effect="light" style="border-radius: 6px; border: none;">
+                                        {{ scope.row.动作 }}
+                                    </el-tag>
+                                </template>
+                            </el-table-column>
+                            <el-table-column prop="详情" label="详情内容"></el-table-column>
+                            <el-table-column label="操作时间" width="200">
+                                <template #default="scope">
+                                    {{ formatTime(scope.row.时间) }}
+                                </template>
+                            </el-table-column>
+                        </el-table>
+                    </div>
+                </div>
+
+                <!-- 2. 基础档案 -->
+                <div v-show="activeMenu === 'books'" class="content-card">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 24px;">
+                        <el-input v-model="searchText" placeholder="搜索教材..." style="width: 300px;" clearable prefix-icon="Search"></el-input>
+                        <el-button type="primary" @click="openAddDialog" icon="Plus" style="border-radius: 12px; background: #10B981; border: none; padding: 0 20px;">新增教材档案</el-button>
+                    </div>
+                    <el-table :data="filteredBooks">
+                        <el-table-column prop="book_id" label="编号" width="80"></el-table-column>
+                        <el-table-column prop="book_name" label="教材名称"></el-table-column>
+                        <el-table-column prop="supplier_name" label="供应商"></el-table-column>
+                        <el-table-column prop="price" label="单价 (¥)"></el-table-column>
+                        <el-table-column label="实时库存">
+                            <template #default="scope">
+                                <span :style="{ color: scope.row.stock < 50 ? '#EF4444' : '#10B981', fontWeight: '700' }">{{ scope.row.stock }} 本</span>
+                            </template>
+                        </el-table-column>
+                        <el-table-column label="操作" width="160">
+                            <template #default="scope">
+                                <el-button size="small" type="primary" link @click="openEditDialog(scope.row)">改价</el-button>
+                                <el-button size="small" type="danger" link @click="deleteBook(scope.row.book_id)">删档</el-button>
+                            </template>
+                        </el-table-column>
+                    </el-table>
+                </div>
+
+                <!-- 3. 征订管理 -->
+                <div v-show="activeMenu === 'order'" class="content-card">
+                    <h3 style="margin-bottom: 20px; font-weight: 700;">提交征订需求</h3>
+                    
+                    <div style="background: #F8FAFC; padding: 24px; border-radius: 16px; margin-bottom: 24px; border: 1px solid #F1F5F9; display: flex; align-items: flex-end; gap: 16px; flex-wrap: wrap;">
+                        <div style="display: flex; flex-direction: column; gap: 8px;">
+                            <span style="font-size: 14px; color: #64748B;">学院</span>
+                            <el-select v-model="orderForm.dept_id" placeholder="全部学院" clearable style="width: 140px;" @change="onDeptChange">
+                                <el-option v-for="dept in uniqueDepts" :key="dept.dept_id" :label="dept.dept_name" :value="dept.dept_id"></el-option>
+                            </el-select>
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 8px;">
+                            <span style="font-size: 14px; color: #64748B;">系</span>
+                            <el-select v-model="orderForm.department_id" placeholder="全部系别" clearable style="width: 140px;" @change="onDepartmentChange">
+                                <el-option v-for="dep in departmentOptions" :key="dep.department_id" :label="dep.department_name" :value="dep.department_id"></el-option>
+                            </el-select>
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 8px;">
+                            <span style="font-size: 14px; color: #64748B;">专业</span>
+                            <el-select v-model="orderForm.major_id" placeholder="全部专业" clearable style="width: 140px;" @change="onMajorChange">
+                                <el-option v-for="major in majorOptions" :key="major.major_id" :label="major.major_name" :value="major.major_id"></el-option>
+                            </el-select>
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 8px;">
+                            <span style="font-size: 14px; color: #64748B;">班级</span>
+                            <el-select v-model="orderForm.class_id" placeholder="全部班级" clearable style="width: 140px;">
+                                <el-option v-for="cls in classOptions" :key="cls.class_id" :label="cls.class_name" :value="cls.class_id"></el-option>
+                            </el-select>
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 8px;">
+                            <span style="font-size: 14px; color: #64748B;">教材</span>
+                            <el-select v-model="orderForm.book_id" placeholder="选择教材" style="width: 180px;">
+                                <el-option v-for="b in bookList" :key="b.book_id" :label="b.book_name" :value="b.book_id"></el-option>
+                            </el-select>
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 8px;">
+                            <span style="font-size: 14px; color: #64748B;">数量（每班）</span>
+                            <el-input-number v-model="orderForm.order_qty" :min="1" style="width: 120px;"></el-input-number>
+                        </div>
+                        <div style="padding-bottom: 2px;">
+                            <el-button type="primary" @click="doOrder" style="background: #10B981; border-radius: 12px; border: none; height: 40px; padding: 0 24px; font-weight: 600;">提交征订</el-button>
+                        </div>
+                        <div style="width: 100%; font-size: 13px; color: #64748B;">
+                            本次征订范围：<span style="color: #10B981; font-weight: 600;">{{ orderScopeText }}</span>
+                        </div>
+                    </div>
+                    
+                    <h3 style="margin-bottom: 20px; font-weight: 700;">征订结算明细</h3>
+                    <el-table :data="orderList">
+                        <el-table-column prop="学院" label="学院"></el-table-column>
+                        <el-table-column prop="系" label="系"></el-table-column>
+                        <el-table-column prop="专业" label="专业"></el-table-column>
+                        <el-table-column prop="班级" label="班级"></el-table-column>
+                        <el-table-column prop="教材" label="教材"></el-table-column>
+                        <el-table-column prop="数量" label="数量"></el-table-column>
+                        <el-table-column prop="总金额" label="金额">
+                            <template #default="scope">
+                                <span style="font-weight: bold; color: #EF4444;">¥ {{ scope.row.总金额 }}</span>
+                            </template>
+                        </el-table-column>
+                        <el-table-column prop="状态" label="状态"></el-table-column>
+                    </el-table>
+                </div>
+
+                <!-- 4. 采购入库 -->
+                <div v-show="activeMenu === 'purchase'" class="content-card">
+                    <h3 style="margin-bottom: 20px; font-weight: 700;">采购入库登记</h3>
+                    
+                    <div style="background: #F8FAFC; padding: 24px; border-radius: 16px; margin-bottom: 24px; border: 1px solid #F1F5F9; display: flex; align-items: flex-end; gap: 20px; flex-wrap: wrap;">
+                        <div style="display: flex; flex-direction: column; gap: 8px;">
+                            <span style="font-size: 14px; color: #64748B;">入库教材</span>
+                            <el-select v-model="purchaseForm.book_id" placeholder="请选择教材" style="width: 200px;" @change="handleBookChange">
+                                <el-option v-for="b in bookList" :key="b.book_id" :label="b.book_name" :value="b.book_id"></el-option>
+                            </el-select>
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 8px;">
+                            <span style="font-size: 14px; color: #64748B;">供应商</span>
+                            <el-input v-model="purchaseForm.supplier_name" disabled style="width: 180px;"></el-input>
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 8px;">
+                            <span style="font-size: 14px; color: #64748B;">单价 (¥)</span>
+                            <el-input v-model="purchaseForm.price" disabled style="width: 120px;"></el-input>
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 8px;">
+                            <span style="font-size: 14px; color: #64748B;">入库数量</span>
+                            <el-input-number v-model="purchaseForm.qty" :min="1" @change="calcTotal" style="width: 140px;"></el-input-number>
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 8px;">
+                            <span style="font-size: 14px; color: #64748B;">采购总额 (¥)</span>
+                            <el-input v-model="purchaseForm.total_amount" disabled style="width: 120px; font-weight: bold; color: #EF4444;"></el-input>
+                        </div>
+                        <div style="padding-bottom: 2px;">
+                            <el-button type="success" @click="doPurchase" style="background: #10B981; border-radius: 12px; border: none; height: 40px; padding: 0 24px; font-weight: 600;">确认入库</el-button>
+                        </div>
+                    </div>
+
+                    <h3 style="margin-bottom: 20px; font-weight: 700;">采购流水明细</h3>
+                    <el-table :data="purchaseRecordsList">
+                        <el-table-column prop="流水号" label="单号" width="80"></el-table-column>
+                        <el-table-column prop="供应商" label="供应商"></el-table-column>
+                        <el-table-column prop="教材" label="教材"></el-table-column>
+                        <el-table-column prop="单价" label="单价"></el-table-column>
+                        <el-table-column prop="采购数量" label="数量"></el-table-column>
+                        <el-table-column prop="采购总额" label="总额">
+                            <template #default="scope">
+                                <span style="font-weight: bold; color: #EF4444;">¥ {{ scope.row.采购总额 }}</span>
+                            </template>
+                        </el-table-column>
+                        <el-table-column label="时间" width="180">
+                            <template #default="scope">
+                                {{ formatTime(scope.row.入库时间) }}
+                            </template>
+                        </el-table-column>
+                    </el-table>
+                </div>
+
+                <!-- 5. 发放退订 -->
+                <div v-show="activeMenu === 'issue'" class="content-card">
+                    <h3 style="margin-bottom: 20px; font-weight: 700;">教材发放与退订</h3>
+                    <el-tabs type="border-card" style="box-shadow: none; border-radius: 16px; overflow: hidden; border: 1px solid #F1F5F9;">
+                        <el-tab-pane label="发放记录">
+                            
+                            <h4 style="margin-top: 15px; margin-bottom: 15px; font-weight: 700;">批量发放（学院 / 系 / 专业 / 班级）</h4>
+                            <div style="background: #F8FAFC; padding: 24px; border-radius: 16px; display: flex; align-items: flex-end; gap: 20px; flex-wrap: wrap;">
+                                <div style="display: flex; flex-direction: column; gap: 8px;">
+                                    <span style="font-size: 14px; color: #64748B;">学院</span>
+                                    <el-select v-model="issueBatchForm.dept_id" placeholder="全部学院" clearable style="width: 150px;" @change="onIssueDeptChange">
+                                        <el-option v-for="dept in uniqueDepts" :key="dept.dept_id" :label="dept.dept_name" :value="dept.dept_id"></el-option>
+                                    </el-select>
+                                </div>
+                                <div style="display: flex; flex-direction: column; gap: 8px;">
+                                    <span style="font-size: 14px; color: #64748B;">系</span>
+                                    <el-select v-model="issueBatchForm.department_id" placeholder="全部系别" clearable style="width: 150px;" @change="onIssueDepartmentChange">
+                                        <el-option v-for="dep in issueDepartments" :key="dep.department_id" :label="dep.department_name" :value="dep.department_id"></el-option>
+                                    </el-select>
+                                </div>
+                                <div style="display: flex; flex-direction: column; gap: 8px;">
+                                    <span style="font-size: 14px; color: #64748B;">专业</span>
+                                    <el-select v-model="issueBatchForm.major_id" placeholder="全部专业" clearable style="width: 150px;" @change="onIssueMajorChange">
+                                        <el-option v-for="m in issueMajors" :key="m.major_id" :label="m.major_name" :value="m.major_id"></el-option>
+                                    </el-select>
+                                </div>
+                                <div style="display: flex; flex-direction: column; gap: 8px;">
+                                    <span style="font-size: 14px; color: #64748B;">班级</span>
+                                    <el-select v-model="issueBatchForm.class_id" placeholder="全部班级" clearable style="width: 150px;">
+                                        <el-option v-for="c in issueClasses" :key="c.class_id" :label="c.class_name" :value="c.class_id"></el-option>
+                                    </el-select>
+                                </div>
+                                <div style="display: flex; flex-direction: column; gap: 8px;">
+                                    <span style="font-size: 14px; color: #64748B;">教材</span>
+                                    <el-select v-model="issueBatchForm.book_id" placeholder="选择教材" style="width: 180px;">
+                                        <el-option v-for="b in bookList" :key="b.book_id" :label="b.book_name" :value="b.book_id"></el-option>
+                                    </el-select>
+                                </div>
+                                <div style="display: flex; flex-direction: column; gap: 8px;">
+                                    <span style="font-size: 14px; color: #64748B;">每人数量</span>
+                                    <el-input-number v-model="issueBatchForm.qty" :min="1" style="width: 120px;"></el-input-number>
+                                </div>
+                                <div style="padding-bottom: 2px;">
+                                    <el-button type="primary" @click="doIssueBatch" style="background: #10B981; border-radius: 12px; border:none; height: 40px; padding: 0 24px; font-weight: 600;">批量发放</el-button>
+                                </div>
+                                <div style="width: 100%; font-size: 13px; color: #64748B;">
+                                    本次发放范围：<span style="color: #10B981; font-weight: 600;">{{ issueScopeText }}</span>
+                                </div>
+                            </div>
+
+                            <el-divider style="border-color: #F1F5F9;">单人发放</el-divider>
+
+                            <!-- 完美对齐的发放记录表单 -->
+                            <div style="background: #F8FAFC; padding: 24px; border-radius: 16px; display: flex; align-items: flex-end; gap: 20px; flex-wrap: wrap;">
+                                <div style="display: flex; flex-direction: column; gap: 8px;">
+                                    <span style="font-size: 14px; color: #64748B;">订单号</span>
+                                    <el-input v-model="issueForm.order_id" style="width: 140px;"></el-input>
+                                </div>
+                                <div style="display: flex; flex-direction: column; gap: 8px;">
+                                    <span style="font-size: 14px; color: #64748B;">学号</span>
+                                    <el-input v-model="issueForm.student_no" style="width: 180px;"></el-input>
+                                </div>
+                                <div style="display: flex; flex-direction: column; gap: 8px;">
+                                    <span style="font-size: 14px; color: #64748B;">发放数量</span>
+                                    <el-input-number v-model="issueForm.qty" :min="1" style="width: 140px;"></el-input-number>
+                                </div>
+                                <div style="padding-bottom: 2px;">
+                                    <el-button type="primary" @click="doIssue" style="background: #10B981; border-radius: 12px; border:none; height: 40px; padding: 0 24px; font-weight: 600;">登记发放</el-button>
+                                </div>
+                            </div>
+
+                            <el-divider style="border-color: #F1F5F9;">未领取名单核对</el-divider>
+                            
+                            <el-form :inline="true">
+                                <el-form-item label="学院">
+                                    <el-select v-model="checkForm.dept_id" placeholder="查全库" clearable style="width: 150px;" @change="onCheckDeptChange">
+                                        <el-option v-for="dept in uniqueDepts" :key="dept.dept_id" :label="dept.dept_name" :value="dept.dept_id"></el-option>
+                                    </el-select>
+                                </el-form-item>
+                                <el-form-item label="班级">
+                                    <el-select v-model="checkForm.class_id" placeholder="查全库" clearable style="width: 150px;" :disabled="!checkForm.dept_id">
+                                        <el-option v-for="cls in checkClassOptions" :key="cls.class_id" :label="cls.class_name" :value="cls.class_id"></el-option>
+                                    </el-select>
+                                </el-form-item>
+                                <el-form-item label="教材">
+                                    <el-select v-model="checkForm.book_id" placeholder="查全库" clearable style="width: 200px;">
+                                        <el-option v-for="b in bookList" :key="b.book_id" :label="b.book_name" :value="b.book_id"></el-option>
+                                    </el-select>
+                                </el-form-item>
+                                <el-form-item>
+                                    <el-button type="warning" @click="doCheckUnissued" icon="Search" style="background: #F59E0B; border-radius: 12px; border: none; color: #fff;">查询</el-button>
+                                </el-form-item>
+                            </el-form>
+
+                            <el-table :data="unissuedList" v-if="unissuedList.length > 0" style="margin-top: 15px;">
+                                <el-table-column type="index" label="#" width="60"></el-table-column>
+                                <el-table-column prop="班级" label="班级"></el-table-column>
+                                <el-table-column prop="教材" label="教材"></el-table-column>
+                                <el-table-column prop="学号" label="学号"></el-table-column>
+                                <el-table-column prop="姓名" label="姓名"></el-table-column>
+                                <el-table-column label="状态" width="150">
+                                    <template #default><el-tag type="danger" effect="light" style="border-radius: 6px; border: none; font-weight: bold;">未领取</el-tag></template>
+                                </el-table-column>
+                            </el-table>
+                        </el-tab-pane>
+                        
+                        <el-tab-pane label="退订 (事务)">
+                            <div style="margin-top: 15px; margin-bottom: 20px;">
+                                <h4 style="margin-bottom: 15px; font-weight: 700;">批量退订（学院 / 系 / 专业 / 班级）</h4>
+                                <div style="background: #F8FAFC; padding: 24px; border-radius: 16px; display: flex; align-items: flex-end; gap: 20px; flex-wrap: wrap;">
+                                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                                        <span style="font-size: 14px; color: #64748B;">学院</span>
+                                        <el-select v-model="batchReturnForm.dept_id" placeholder="全部学院" clearable style="width: 150px;" @change="onReturnDeptChange">
+                                            <el-option v-for="dept in uniqueDepts" :key="dept.dept_id" :label="dept.dept_name" :value="dept.dept_id"></el-option>
+                                        </el-select>
+                                    </div>
+                                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                                        <span style="font-size: 14px; color: #64748B;">系</span>
+                                        <el-select v-model="batchReturnForm.department_id" placeholder="全部系别" clearable style="width: 150px;" @change="onReturnDepartmentChange">
+                                            <el-option v-for="dep in returnDepartments" :key="dep.department_id" :label="dep.department_name" :value="dep.department_id"></el-option>
+                                        </el-select>
+                                    </div>
+                                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                                        <span style="font-size: 14px; color: #64748B;">专业</span>
+                                        <el-select v-model="batchReturnForm.major_id" placeholder="全部专业" clearable style="width: 150px;" @change="onReturnMajorChange">
+                                            <el-option v-for="m in returnMajors" :key="m.major_id" :label="m.major_name" :value="m.major_id"></el-option>
+                                        </el-select>
+                                    </div>
+                                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                                        <span style="font-size: 14px; color: #64748B;">班级</span>
+                                        <el-select v-model="batchReturnForm.class_id" placeholder="全部班级" clearable style="width: 150px;">
+                                            <el-option v-for="c in returnClasses" :key="c.class_id" :label="c.class_name" :value="c.class_id"></el-option>
+                                        </el-select>
+                                    </div>
+                                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                                        <span style="font-size: 14px; color: #64748B;">教材</span>
+                                        <el-select v-model="batchReturnForm.book_id" placeholder="选择教材" style="width: 180px;">
+                                            <el-option v-for="b in bookList" :key="b.book_id" :label="b.book_name" :value="b.book_id"></el-option>
+                                        </el-select>
+                                    </div>
+                                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                                        <span style="font-size: 14px; color: #64748B;">每班数量</span>
+                                        <el-input-number v-model="batchReturnForm.qty" :min="1" style="width: 120px;"></el-input-number>
+                                    </div>
+                                    <div style="padding-bottom: 2px;">
+                                        <el-button type="danger" @click="doBatchReturn" style="background: #EF4444; border-radius: 12px; border: none; height: 40px; padding: 0 24px; font-weight: 600;">执行退货</el-button>
+                                    </div>
+                                    <div style="width: 100%; font-size: 13px; color: #64748B;">
+                                        本次退订范围：<span style="color: #EF4444; font-weight: 600;">{{ returnScopeText }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <el-divider style="border-color: #F1F5F9;"></el-divider>
+                            <h4 style="margin-bottom: 15px; font-weight: 700;">单人退订</h4>
+                            <el-form :inline="true">
+                                <el-form-item label="订单号"><el-input v-model="returnForm.order_id" style="width: 120px;"></el-input></el-form-item>
+                                <el-form-item label="学号"><el-input v-model="returnForm.student_no" style="width: 150px;"></el-input></el-form-item>
+                                <el-form-item label="数量"><el-input-number v-model="returnForm.qty" :min="1"></el-input-number></el-form-item>
+                                <el-form-item><el-button type="warning" @click="doReturn" style="background: #F59E0B; border-radius: 12px; border: none; color: #fff;">单人退货</el-button></el-form-item>
+                            </el-form>
+                        </el-tab-pane>
+                    </el-tabs>
+                </div>
+
+                <!-- 6. 统计 -->
+                <div v-show="activeMenu === 'stats'" class="content-card">
+                    <h3 style="margin-bottom: 24px; font-weight: 700;">数据报表</h3>
+                    <el-row :gutter="24">
+                        <el-col :span="12">
+                            <div style="background: #F8FAFC; padding: 20px; border-radius: 16px; margin-bottom: 24px; border: 1px solid #F1F5F9;">
+                                <h4 style="margin-bottom: 15px; font-weight: 700;">供应商采购排行</h4>
+                                <el-table :data="supplierList">
+                                    <el-table-column prop="供应商" label="供应商"></el-table-column>
+                                    <el-table-column prop="供货数量" label="供货量"></el-table-column>
+                                    <el-table-column prop="结算总额" label="结算额"></el-table-column>
+                                </el-table>
+                            </div>
+                        </el-col>
+                        <el-col :span="12">
+                            <div style="background: #F8FAFC; padding: 20px; border-radius: 16px; margin-bottom: 24px; border: 1px solid #F1F5F9;">
+                                <h4 style="margin-bottom: 15px; font-weight: 700;">学院经费排行</h4>
+                                <el-table :data="academyList">
+                                    <el-table-column prop="学院" label="学院"></el-table-column>
+                                    <el-table-column prop="消耗经费" label="经费消耗 (¥)"></el-table-column>
+                                </el-table>
+                            </div>
+                        </el-col>
+                    </el-row>
+                </div>
+            </div>
+        </div>
+
+        <!-- 弹窗 -->
+        <el-dialog :title="dialogType === 'add' ? '新增教材' : '修改价格'" v-model="dialogVisible" width="420px">
+            <el-form :model="formData" label-width="80px">
+                <el-form-item label="教材名称" v-if="dialogType === 'add'"><el-input v-model="formData.book_name"></el-input></el-form-item>
+                <el-form-item label="供应商" v-if="dialogType === 'add'">
+                    <div style="display: flex; gap: 10px; width: 100%;">
+                        <el-select v-model="formData.supplier_id" placeholder="请选择" style="flex: 1;">
+                            <el-option v-for="s in supplierOptions" :key="s.supplier_id" :label="s.supplier_name" :value="s.supplier_id"></el-option>
+                        </el-select>
+                        <el-button type="primary" plain @click="openSupplierDialog" icon="Plus" style="border-radius: 12px;">新建</el-button>
+                    </div>
+                </el-form-item>
+                <el-form-item label="单价(元)"><el-input-number v-model="formData.price" :precision="2"></el-input-number></el-form-item>
+                <el-form-item label="初始库存" v-if="dialogType === 'add'"><el-input-number v-model="formData.stock"></el-input-number></el-form-item>
+            </el-form>
+            <template #footer><el-button type="primary" @click="submitForm" style="background: #10B981; border-radius: 12px; border: none;">确定</el-button></template>
+        </el-dialog>
+
+        <el-dialog title="新建供应商" v-model="supplierDialogVisible" width="350px" append-to-body>
+            <el-form label-width="80px">
+                <el-form-item label="名称"><el-input v-model="newSupplierName"></el-input></el-form-item>
+            </el-form>
+            <template #footer>
+                <el-button @click="supplierDialogVisible = false" style="border-radius: 12px;">取消</el-button>
+                <el-button type="primary" @click="submitNewSupplier" style="background: #10B981; border-radius: 12px; border:none;">创建</el-button>
+            </template>
+        </el-dialog>
+    </div>
+
+    <script>
+        const { createApp, ref, computed, nextTick } = Vue;
+        const { ElMessage, ElMessageBox } = ElementPlus;
+
+        createApp({
+            setup() {
+                const isLogin = ref(false);
+                const loginForm = ref({ username: '', password: '' });
+                const activeMenu = ref('dashboard');
+                
+                const bookList = ref([]);
+                const supplierOptions = ref([]);
+                const hierarchyData = ref([]);
+                const warningList = ref([]);
+                const supplierList = ref([]);
+                const academyList = ref([]);
+                const logList = ref([]);
+                const orderList = ref([]);
+                const purchaseRecordsList = ref([]);
+                const searchText = ref('');
+                
+                const dialogVisible = ref(false);
+                const dialogType = ref('add'); 
+                const formData = ref({ book_id: null, book_name: '', supplier_id: null, price: 0, stock: 0 });
+                
+                const supplierDialogVisible = ref(false);
+                const newSupplierName = ref('');
+
+                const purchaseForm = ref({ book_id: null, qty: 100, supplier_name: '', price: 0, total_amount: 0 });
+                const returnForm = ref({ order_id: '1', student_no: '2023010101', qty: 1 });
+                const issueForm = ref({ order_id: '1', student_no: '2023010101', qty: 1 });
+                
+                const orderForm = ref({ dept_id: '', department_id: '', major_id: '', class_id: '', book_id: '', order_qty: 40 });
+                const batchReturnForm = ref({ dept_id: '', department_id: '', major_id: '', class_id: '', book_id: '', qty: 1 });
+                const issueBatchForm = ref({ dept_id: '', department_id: '', major_id: '', class_id: '', book_id: '', qty: 1 });
+                
+                const checkForm = ref({ dept_id: '', class_id: '', book_id: '' });
+                const unissuedList = ref([]);
+
+                // 图表相关
+                let lineChartInstance = null;
+                let pieChartInstance = null;
+
+                const initCharts = () => {
+                    if (lineChartInstance) lineChartInstance.dispose();
+                    if (pieChartInstance) pieChartInstance.dispose();
+
+                    const lineDom = document.getElementById('lineChart');
+                    const pieDom = document.getElementById('pieChart');
+                    if(!lineDom || !pieDom) return;
+
+                    lineChartInstance = echarts.init(lineDom);
+                    lineChartInstance.setOption({
+                        tooltip: { trigger: 'axis' },
+                        grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
+                        xAxis: { type: 'category', boundaryGap: false, data: ['周一', '周二', '周三', '周四', '周五', '周六', '周日'], axisLine: { lineStyle: { color: '#E2E8F0' } }, axisLabel: { color: '#64748B'} },
+                        yAxis: { type: 'value', splitLine: { lineStyle: { color: '#F1F5F9' } }, axisLabel: { color: '#64748B'} },
+                        series: [{
+                            name: '入库数量', type: 'line', smooth: true, symbolSize: 8, itemStyle: { color: '#10B981' },
+                            areaStyle: { color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [ { offset: 0, color: 'rgba(16, 185, 129, 0.3)' }, { offset: 1, color: 'rgba(16, 185, 129, 0.05)' } ]) },
+                            data: [120, 132, 101, 134, 90, 230, 210]
+                        }]
+                    });
+
+                    pieChartInstance = echarts.init(pieDom);
+                    pieChartInstance.setOption({
+                        tooltip: { trigger: 'item' },
+                        legend: { top: 'bottom', icon: 'circle', textStyle: { color: '#64748B' } },
+                        color: ['#10B981', '#3B82F6', '#F59E0B', '#8B5CF6', '#EF4444'],
+                        series: [{
+                            name: '学院经费', type: 'pie', radius: ['50%', '70%'], avoidLabelOverlap: false, itemStyle: { borderRadius: 10, borderColor: '#fff', borderWidth: 2 }, label: { show: false },
+                            data: academyList.value.length > 0 ? academyList.value.map(item => ({ value: item.消耗经费, name: item.学院 })) : [{value: 100, name: '暂无数据'}]
+                        }]
+                    });
+
+                    window.addEventListener('resize', () => {
+                        if(lineChartInstance) lineChartInstance.resize();
+                        if(pieChartInstance) pieChartInstance.resize();
+                    });
+                };
+
+                const formatTime = (timeStr) => {
+                    if(!timeStr) return '';
+                    const d = new Date(timeStr);
+                    return d.toLocaleString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' });
+                };
+
+                // 业务逻辑
+                const switchMenu = (menu) => {
+                    activeMenu.value = menu;
+                    if (menu === 'dashboard') {
+                        nextTick(() => { setTimeout(initCharts, 100); });
+                    }
+                };
+
+                const handleCommand = (command) => {
+                    if (command === 'logout') {
+                        isLogin.value = false;
+                        ElMessage.success('已安全退出系统');
+                    }
+                };
+
+                const doLogin = () => {
+                    fetch('/api/login', {
+                        method: 'POST', headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(loginForm.value)
+                    }).then(res => res.json()).then(res => {
+                        if (res.code === 200) { 
+                            isLogin.value = true; 
+                            fetchAllData(); 
+                            nextTick(() => { setTimeout(initCharts, 500); });
+                        } else { ElMessage.error(res.msg); }
+                    });
+                };
+
+                const fetchAllData = () => {
+                    fetch('/api/books').then(r=>r.json()).then(r=>bookList.value=r.data);
+                    fetch('/api/suppliers').then(r=>r.json()).then(r=>supplierOptions.value=r.data);
+                    fetch('/api/hierarchy').then(r=>r.json()).then(r=>hierarchyData.value=r.data);
+                    fetch('/api/warning').then(r=>r.json()).then(r=>warningList.value=r.data);
+                    fetch('/api/supplier_stats').then(r=>r.json()).then(r=>supplierList.value=r.data);
+                    fetch('/api/academy_stats').then(r=>r.json()).then(r=>academyList.value=r.data);
+                    fetch('/api/logs').then(r=>r.json()).then(r=>logList.value=r.data);
+                    fetch('/api/purchase_records').then(r=>r.json()).then(r=>purchaseRecordsList.value=r.data);
+                    fetch('/api/query_orders', {
+                        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({})
+                    }).then(r=>r.json()).then(r=>orderList.value=r.data);
+                };
+
+                // 自由组合联动逻辑
+                const uniqueBy = (list) => Array.from(new Set(list.map(JSON.stringify))).map(JSON.parse);
+
+                const uniqueDepts = computed(() => uniqueBy(
+                    hierarchyData.value.map(item => ({ dept_id: item.dept_id, dept_name: item.dept_name }))
+                ));
+
+                // 为任意表单生成四级联动选项 + 当前筛选覆盖的班级（留空=全部）
+                const buildCascade = (formRef) => {
+                    const departments = computed(() => uniqueBy(
+                        hierarchyData.value
+                            .filter(item => !formRef.value.dept_id || item.dept_id === formRef.value.dept_id)
+                            .map(item => ({ department_id: item.department_id, department_name: item.department_name }))
+                    ));
+                    const majors = computed(() => uniqueBy(
+                        hierarchyData.value
+                            .filter(item => (!formRef.value.dept_id || item.dept_id === formRef.value.dept_id)
+                                        && (!formRef.value.department_id || item.department_id === formRef.value.department_id))
+                            .map(item => ({ major_id: item.major_id, major_name: item.major_name }))
+                    ));
+                    const classes = computed(() => uniqueBy(
+                        hierarchyData.value
+                            .filter(item => (!formRef.value.dept_id || item.dept_id === formRef.value.dept_id)
+                                        && (!formRef.value.department_id || item.department_id === formRef.value.department_id)
+                                        && (!formRef.value.major_id || item.major_id === formRef.value.major_id))
+                            .map(item => ({ class_id: item.class_id, class_name: item.class_name }))
+                    ));
+                    const targets = computed(() => {
+                        const f = formRef.value;
+                        const map = new Map();
+                        hierarchyData.value
+                            .filter(item => (!f.dept_id || item.dept_id === f.dept_id)
+                                        && (!f.department_id || item.department_id === f.department_id)
+                                        && (!f.major_id || item.major_id === f.major_id)
+                                        && (!f.class_id || item.class_id === f.class_id))
+                            .forEach(item => { if (!map.has(item.class_id)) map.set(item.class_id, item); });
+                        return Array.from(map.values());
+                    });
+                    return { departments, majors, classes, targets };
+                };
+
+                const orderCascade = buildCascade(orderForm);
+                const issueCascade = buildCascade(issueBatchForm);
+                const returnCascade = buildCascade(batchReturnForm);
+
+                const departmentOptions = orderCascade.departments;
+                const majorOptions = orderCascade.majors;
+                const classOptions = orderCascade.classes;
+                const orderTargets = orderCascade.targets;
+
+                const issueDepartments = issueCascade.departments;
+                const issueMajors = issueCascade.majors;
+                const issueClasses = issueCascade.classes;
+                const returnDepartments = returnCascade.departments;
+                const returnMajors = returnCascade.majors;
+                const returnClasses = returnCascade.classes;
+
+                const orderScopeText = computed(() => {
+                    const targets = orderTargets.value;
+                    if (targets.length === 0) return '当前筛选条件下暂无班级';
+                    const sample = targets.slice(0, 3).map(t => t.class_name).join('、');
+                    const qty = orderForm.value.order_qty || 0;
+                    return `${targets.length} 个班级（${sample}${targets.length > 3 ? ' 等' : ''}），每班 ${qty} 本，共 ${targets.length * qty} 本`;
+                });
+
+                const issueScopeText = computed(() => {
+                    const targets = issueCascade.targets.value;
+                    if (targets.length === 0) return '当前筛选条件下暂无班级';
+                    const sample = targets.slice(0, 3).map(t => t.class_name).join('、');
+                    const qty = issueBatchForm.value.qty || 0;
+                    return `${targets.length} 个班级（${sample}${targets.length > 3 ? ' 等' : ''}）内所有未领取学生，每人 ${qty} 本`;
+                });
+
+                const returnScopeText = computed(() => {
+                    const targets = returnCascade.targets.value;
+                    if (targets.length === 0) return '当前筛选条件下暂无班级';
+                    const sample = targets.slice(0, 3).map(t => t.class_name).join('、');
+                    const qty = batchReturnForm.value.qty || 0;
+                    return `${targets.length} 个班级（${sample}${targets.length > 3 ? ' 等' : ''}），每班退 ${qty} 本，最多共 ${targets.length * qty} 本`;
+                });
+
+                // 切换上级时清空下级，避免出现跨层级脏数据
+                const resetCascade = (formRef, level) => {
+                    if (level === 'dept') {
+                        formRef.value.department_id = '';
+                        formRef.value.major_id = '';
+                        formRef.value.class_id = '';
+                    } else if (level === 'department') {
+                        formRef.value.major_id = '';
+                        formRef.value.class_id = '';
+                    } else {
+                        formRef.value.class_id = '';
+                    }
+                };
+
+                const onDeptChange = () => resetCascade(orderForm, 'dept');
+                const onDepartmentChange = () => resetCascade(orderForm, 'department');
+                const onMajorChange = () => resetCascade(orderForm, 'major');
+                const onIssueDeptChange = () => resetCascade(issueBatchForm, 'dept');
+                const onIssueDepartmentChange = () => resetCascade(issueBatchForm, 'department');
+                const onIssueMajorChange = () => resetCascade(issueBatchForm, 'major');
+                const onReturnDeptChange = () => resetCascade(batchReturnForm, 'dept');
+                const onReturnDepartmentChange = () => resetCascade(batchReturnForm, 'department');
+                const onReturnMajorChange = () => resetCascade(batchReturnForm, 'major');
+
+                const checkClassOptions = computed(() => {
+                    if (!checkForm.value.dept_id) return [];
+                    const classes = hierarchyData.value
+                        .filter(item => item.dept_id === checkForm.value.dept_id)
+                        .map(item => ({ class_id: item.class_id, class_name: item.class_name }));
+                    return Array.from(new Set(classes.map(JSON.stringify))).map(JSON.parse);
+                });
+                const onCheckDeptChange = () => { checkForm.value.class_id = ''; };
+
+                const handleBookChange = (bookId) => {
+                    const selectedBook = bookList.value.find(b => b.book_id === bookId);
+                    if (selectedBook) {
+                        purchaseForm.value.price = selectedBook.price;
+                        purchaseForm.value.supplier_name = selectedBook.supplier_name; 
+                        calcTotal();
+                    }
+                };
+                const calcTotal = () => {
+                    purchaseForm.value.total_amount = (purchaseForm.value.price * purchaseForm.value.qty).toFixed(2);
+                };
+
+                const filteredBooks = computed(() => bookList.value.filter(b => b.book_name.includes(searchText.value)));
+                
+                const openAddDialog = () => { 
+                    dialogType.value='add'; 
+                    formData.value={book_id:null,book_name:'',supplier_id: null,price:0,stock:0}; 
+                    dialogVisible.value=true; 
+                };
+                const openEditDialog = (row) => { 
+                    dialogType.value='edit'; 
+                    formData.value={...row}; 
+                    dialogVisible.value=true; 
+                };
+                
+                const submitForm = () => {
+                    if (dialogType.value === 'add' && !formData.value.supplier_id) {
+                        return ElMessage.warning('请选择供应商');
+                    }
+                    const url = dialogType.value === 'add' ? '/api/add_book' : '/api/update_book';
+                    fetch(`${url}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(formData.value) }).then(res => res.json()).then(res => { 
+                        ElMessage.success(res.msg); dialogVisible.value = false; fetchAllData(); 
+                    });
+                };
+
+                const deleteBook = (id) => { 
+                    ElMessageBox.confirm('确定删除这本教材及关联记录吗？').then(() => { 
+                        fetch(`/api/delete_book/${id}`, { method: 'DELETE' }).then(res=>res.json()).then(res=>{ 
+                            if (res.code === 200) { ElMessage.success(res.msg); fetchAllData(); }
+                            else { ElMessage.error(res.msg); }
+                        }); 
+                    }); 
+                };
+
+                const openSupplierDialog = () => {
+                    newSupplierName.value = '';
+                    supplierDialogVisible.value = true;
+                };
+
+                const submitNewSupplier = () => {
+                    if (!newSupplierName.value.trim()) return ElMessage.warning('请输入供应商名称');
+                    fetch('/api/add_supplier', {
+                        method: 'POST', headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ supplier_name: newSupplierName.value })
+                    }).then(res => res.json()).then(res => {
+                        if (res.code === 200) {
+                            ElMessage.success('供应商创建成功！');
+                            supplierDialogVisible.value = false;
+                            fetch('/api/suppliers')
+                                .then(r=>r.json()).then(r=>{
+                                    supplierOptions.value = r.data;
+                                    if (supplierOptions.value.length > 0) {
+                                        formData.value.supplier_id = supplierOptions.value[supplierOptions.value.length - 1].supplier_id;
+                                    }
+                                });
+                        } else {
+                            ElMessage.error(res.msg);
+                        }
+                    });
+                };
+
+                const doOrder = () => {
+                    if (!orderForm.value.book_id) return ElMessage.warning('请选择教材');
+                    if (!orderForm.value.order_qty || orderForm.value.order_qty < 1) return ElMessage.warning('征订数量必须大于 0');
+
+                    const targets = orderTargets.value;
+                    if (targets.length === 0) return ElMessage.warning('当前筛选条件下没有可征订的班级，请重新选择学院/系');
+
+                    const book = bookList.value.find(b => b.book_id === orderForm.value.book_id);
+                    const qty = orderForm.value.order_qty;
+                    const total = targets.length * qty;
+
+                    const submit = () => {
+                        fetch('/api/add_order', {
+                            method: 'POST', headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ book_id: orderForm.value.book_id, order_qty: qty, class_ids: targets.map(t => t.class_id) })
+                        }).then(res => res.json()).then(res => {
+                            if (res.code === 200) { ElMessage.success(res.msg); fetchAllData(); }
+                            else { ElMessage.error(res.msg); }
+                        });
+                    };
+
+                    if (targets.length === 1) { submit(); return; }
+
+                    const sample = targets.slice(0, 3).map(t => t.class_name).join('、');
+                    const amount = book ? `，预计金额 ¥${(total * Number(book.price)).toFixed(2)}` : '';
+                    ElMessageBox.confirm(
+                        `将为 ${targets.length} 个班级提交征订（${sample}${targets.length > 3 ? ' 等' : ''}），每班 ${qty} 本，共 ${total} 本${amount}。是否继续？`,
+                        '批量征订确认',
+                        { type: 'info', confirmButtonText: '确认征订', cancelButtonText: '取消' }
+                    ).then(submit).catch(() => {});
+                };
+                const doPurchase = () => {
+                    if(!purchaseForm.value.book_id) return ElMessage.warning('请选择教材');
+                    fetch('/api/purchase', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(purchaseForm.value) }).then(res => res.json()).then(res => { ElMessage.success(res.msg); fetchAllData(); });
+                };
+                const doReturn = () => {
+                    fetch('/api/return', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(returnForm.value) }).then(res => res.json()).then(res => { ElMessage.success(res.msg); fetchAllData(); });
+                };
+                const doIssue = () => {
+                    fetch('/api/issue', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(issueForm.value) }).then(res => res.json()).then(res => { ElMessage.success(res.msg); fetchAllData(); });
+                };
+                const doIssueBatch = () => {
+                    const f = issueBatchForm.value;
+                    if (!f.book_id) return ElMessage.warning('请选择教材');
+                    if (!f.qty || f.qty < 1) return ElMessage.warning('发放数量必须大于 0');
+                    const targets = issueCascade.targets.value;
+                    if (targets.length === 0) return ElMessage.warning('当前筛选条件下没有可发放的班级');
+
+                    const book = bookList.value.find(b => b.book_id === f.book_id);
+                    const sample = targets.slice(0, 3).map(t => t.class_name).join('、');
+                    ElMessageBox.confirm(
+                        `将为 ${targets.length} 个班级（${sample}${targets.length > 3 ? ' 等' : ''}）内所有未领取《${book ? book.book_name : ''}》的学生发放，每人 ${f.qty} 本。是否继续？`,
+                        '批量发放确认',
+                        { type: 'info', confirmButtonText: '确认发放', cancelButtonText: '取消' }
+                    ).then(() => {
+                        fetch('/api/batch_issue', {
+                            method: 'POST', headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                dept_id: f.dept_id, department_id: f.department_id, major_id: f.major_id,
+                                class_id: f.class_id, book_id: f.book_id, qty: f.qty
+                            })
+                        }).then(res => res.json()).then(res => {
+                            if (res.code === 200) { ElMessage.success(res.msg); fetchAllData(); }
+                            else { ElMessage.error(res.msg); }
+                        });
+                    }).catch(() => {});
+                };
+                const doBatchReturn = () => {
+                    const f = batchReturnForm.value;
+                    if (!f.book_id) return ElMessage.warning('请选择教材');
+                    if (!f.qty || f.qty < 1) return ElMessage.warning('退订数量必须大于 0');
+                    const targets = returnCascade.targets.value;
+                    if (targets.length === 0) return ElMessage.warning('当前筛选条件下没有可退订的班级');
+
+                    const book = bookList.value.find(b => b.book_id === f.book_id);
+                    const sample = targets.slice(0, 3).map(t => t.class_name).join('、');
+                    ElMessageBox.confirm(
+                        `将对 ${targets.length} 个班级（${sample}${targets.length > 3 ? ' 等' : ''}）的《${book ? book.book_name : ''}》订单各退 ${f.qty} 本（超出剩余量按剩余量退）。是否继续？`,
+                        '批量退订确认',
+                        { type: 'warning', confirmButtonText: '确认退订', cancelButtonText: '取消' }
+                    ).then(() => {
+                        fetch('/api/batch_return', {
+                            method: 'POST', headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                dept_id: f.dept_id, department_id: f.department_id, major_id: f.major_id,
+                                class_id: f.class_id, book_id: f.book_id, qty: f.qty
+                            })
+                        }).then(res => res.json()).then(res => {
+                            if (res.code === 200) { ElMessage.success(res.msg); fetchAllData(); }
+                            else { ElMessage.error(res.msg); }
+                        });
+                    }).catch(() => {});
+                };
+                
+                const doCheckUnissued = () => {
+                    fetch('/api/unissued', { 
+                        method: 'POST', headers: { 'Content-Type': 'application/json' }, 
+                        body: JSON.stringify(checkForm.value) 
+                    }).then(res => res.json()).then(res => {
+                        unissuedList.value = res.data;
+                        if(res.data.length === 0) ElMessage.success('太棒了，系统内所有教材已全员发放完毕！'); 
+                        else ElMessage.warning(`全库共查到有 ${res.data.length} 条未领取记录`);
+                    });
+                };
+
+                return { 
+                    isLogin, loginForm, doLogin, handleCommand, switchMenu, activeMenu, formatTime,
+                    bookList, supplierOptions, hierarchyData, warningList, supplierList, academyList, logList, orderList, purchaseRecordsList, searchText, filteredBooks,
+                    dialogVisible, dialogType, formData, purchaseForm, returnForm, issueForm, orderForm, batchReturnForm, issueBatchForm,
+                    checkForm, unissuedList, doCheckUnissued, handleBookChange, calcTotal,
+                    issueDepartments, issueMajors, issueClasses, issueScopeText, doIssueBatch,
+                    onIssueDeptChange, onIssueDepartmentChange, onIssueMajorChange,
+                    returnDepartments, returnMajors, returnClasses, returnScopeText,
+                    onReturnDeptChange, onReturnDepartmentChange, onReturnMajorChange,
+                    uniqueDepts, departmentOptions, majorOptions, classOptions, orderTargets, orderScopeText, onDeptChange, onDepartmentChange, onMajorChange, checkClassOptions, onCheckDeptChange,
+                    supplierDialogVisible, newSupplierName, openSupplierDialog, submitNewSupplier,
+                    openAddDialog, openEditDialog, submitForm, deleteBook, doOrder, doPurchase, doReturn, doIssue, doBatchReturn
+                };
+            }
+        }).use(ElementPlus).mount('#app');
+    </script>
+</body>
+</html>

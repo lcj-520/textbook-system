@@ -1,0 +1,130 @@
+-- 演示数据（由本地 MySQL 导出，供云端 SQLite 初始化使用）
+BEGIN TRANSACTION;
+-- t_supplier: 4 rows
+INSERT INTO t_supplier ("supplier_id", "supplier_name") VALUES (1, '西安教育图书发行公司');
+INSERT INTO t_supplier ("supplier_id", "supplier_name") VALUES (2, '北京高教教材供应中心');
+INSERT INTO t_supplier ("supplier_id", "supplier_name") VALUES (3, '陕西新华书店');
+INSERT INTO t_supplier ("supplier_id", "supplier_name") VALUES (4, '人民邮电出版社');
+-- t_dept: 3 rows
+INSERT INTO t_dept ("dept_id", "dept_name") VALUES (1, '人工智能学院');
+INSERT INTO t_dept ("dept_id", "dept_name") VALUES (2, '汽车工程学院');
+INSERT INTO t_dept ("dept_id", "dept_name") VALUES (3, '经济管理学院');
+-- t_department: 5 rows
+INSERT INTO t_department ("department_id", "department_name", "dept_id") VALUES (1, '计算机科学系', 1);
+INSERT INTO t_department ("department_id", "department_name", "dept_id") VALUES (2, '电子信息系', 1);
+INSERT INTO t_department ("department_id", "department_name", "dept_id") VALUES (3, '汽车工程系', 2);
+INSERT INTO t_department ("department_id", "department_name", "dept_id") VALUES (4, '新能源系', 2);
+INSERT INTO t_department ("department_id", "department_name", "dept_id") VALUES (5, '管理系', 3);
+-- t_major: 5 rows
+INSERT INTO t_major ("major_id", "major_name", "department_id") VALUES (1, '大数据工程技术', 1);
+INSERT INTO t_major ("major_id", "major_name", "department_id") VALUES (2, '人工智能技术应用', 2);
+INSERT INTO t_major ("major_id", "major_name", "department_id") VALUES (3, '汽车检测与维修', 3);
+INSERT INTO t_major ("major_id", "major_name", "department_id") VALUES (4, '新能源汽车技术', 4);
+INSERT INTO t_major ("major_id", "major_name", "department_id") VALUES (5, '会计', 5);
+-- t_class: 5 rows
+INSERT INTO t_class ("class_id", "class_name", "major_id") VALUES (1, '大数据2301', 1);
+INSERT INTO t_class ("class_id", "class_name", "major_id") VALUES (2, '人工智能2301', 2);
+INSERT INTO t_class ("class_id", "class_name", "major_id") VALUES (3, '汽检2301', 3);
+INSERT INTO t_class ("class_id", "class_name", "major_id") VALUES (4, '新能源2301', 4);
+INSERT INTO t_class ("class_id", "class_name", "major_id") VALUES (5, '会计2301', 5);
+-- t_student: 20 rows
+INSERT INTO t_student ("student_no", "student_name", "class_id") VALUES ('2023010101', '张伟', 1);
+INSERT INTO t_student ("student_no", "student_name", "class_id") VALUES ('2023010102', '李娜', 1);
+INSERT INTO t_student ("student_no", "student_name", "class_id") VALUES ('2023010103', '王强', 1);
+INSERT INTO t_student ("student_no", "student_name", "class_id") VALUES ('2023010104', '刘洋', 1);
+INSERT INTO t_student ("student_no", "student_name", "class_id") VALUES ('2023010105', '陈晨', 1);
+INSERT INTO t_student ("student_no", "student_name", "class_id") VALUES ('2023010201', '杨帆', 2);
+INSERT INTO t_student ("student_no", "student_name", "class_id") VALUES ('2023010202', '赵敏', 2);
+INSERT INTO t_student ("student_no", "student_name", "class_id") VALUES ('2023010203', '周杰', 2);
+INSERT INTO t_student ("student_no", "student_name", "class_id") VALUES ('2023010204', '吴桐', 2);
+INSERT INTO t_student ("student_no", "student_name", "class_id") VALUES ('2023010301', '孙悦', 3);
+INSERT INTO t_student ("student_no", "student_name", "class_id") VALUES ('2023010302', '马超', 3);
+INSERT INTO t_student ("student_no", "student_name", "class_id") VALUES ('2023010303', '朱琳', 3);
+INSERT INTO t_student ("student_no", "student_name", "class_id") VALUES ('2023010304', '胡军', 3);
+INSERT INTO t_student ("student_no", "student_name", "class_id") VALUES ('2023010401', '林静', 4);
+INSERT INTO t_student ("student_no", "student_name", "class_id") VALUES ('2023010402', '何伟', 4);
+INSERT INTO t_student ("student_no", "student_name", "class_id") VALUES ('2023010403', '高丽', 4);
+INSERT INTO t_student ("student_no", "student_name", "class_id") VALUES ('2023010404', '罗鹏', 4);
+INSERT INTO t_student ("student_no", "student_name", "class_id") VALUES ('2023010501', '梁雪', 5);
+INSERT INTO t_student ("student_no", "student_name", "class_id") VALUES ('2023010502', '宋涛', 5);
+INSERT INTO t_student ("student_no", "student_name", "class_id") VALUES ('2023010503', '唐磊', 5);
+-- t_book: 12 rows
+INSERT INTO t_book ("book_id", "book_name", "supplier_id", "price", "stock") VALUES (1, '数据库原理及应用', 1, '45.00', 201);
+INSERT INTO t_book ("book_id", "book_name", "supplier_id", "price", "stock") VALUES (2, 'Java程序设计', 2, '52.00', 150);
+INSERT INTO t_book ("book_id", "book_name", "supplier_id", "price", "stock") VALUES (3, '汽车构造', 3, '68.00', 100);
+INSERT INTO t_book ("book_id", "book_name", "supplier_id", "price", "stock") VALUES (4, '高等数学', 1, '38.50', 120);
+INSERT INTO t_book ("book_id", "book_name", "supplier_id", "price", "stock") VALUES (5, '大学英语', 2, '42.00', 80);
+INSERT INTO t_book ("book_id", "book_name", "supplier_id", "price", "stock") VALUES (6, 'Python数据分析', 4, '59.00', 60);
+INSERT INTO t_book ("book_id", "book_name", "supplier_id", "price", "stock") VALUES (7, '数据结构', 4, '48.00', 70);
+INSERT INTO t_book ("book_id", "book_name", "supplier_id", "price", "stock") VALUES (8, '操作系统', 2, '65.00', 50);
+INSERT INTO t_book ("book_id", "book_name", "supplier_id", "price", "stock") VALUES (9, '计算机网络', 1, '55.00', 60);
+INSERT INTO t_book ("book_id", "book_name", "supplier_id", "price", "stock") VALUES (10, '会计学原理', 3, '46.00', 90);
+INSERT INTO t_book ("book_id", "book_name", "supplier_id", "price", "stock") VALUES (11, 'C语言', 3, '50.00', 20);
+INSERT INTO t_book ("book_id", "book_name", "supplier_id", "price", "stock") VALUES (12, '大学体育', 3, '20.00', 552);
+-- t_order: 22 rows
+INSERT INTO t_order ("order_id", "class_id", "book_id", "order_qty", "status") VALUES (1, 1, 1, 40, '已退订');
+INSERT INTO t_order ("order_id", "class_id", "book_id", "order_qty", "status") VALUES (2, 1, 2, 40, '待采购');
+INSERT INTO t_order ("order_id", "class_id", "book_id", "order_qty", "status") VALUES (3, 1, 4, 40, '待采购');
+INSERT INTO t_order ("order_id", "class_id", "book_id", "order_qty", "status") VALUES (4, 1, 7, 40, '待采购');
+INSERT INTO t_order ("order_id", "class_id", "book_id", "order_qty", "status") VALUES (5, 2, 1, 35, '待采购');
+INSERT INTO t_order ("order_id", "class_id", "book_id", "order_qty", "status") VALUES (6, 2, 6, 35, '待采购');
+INSERT INTO t_order ("order_id", "class_id", "book_id", "order_qty", "status") VALUES (7, 2, 8, 35, '待采购');
+INSERT INTO t_order ("order_id", "class_id", "book_id", "order_qty", "status") VALUES (8, 3, 3, 30, '待采购');
+INSERT INTO t_order ("order_id", "class_id", "book_id", "order_qty", "status") VALUES (9, 3, 5, 30, '待采购');
+INSERT INTO t_order ("order_id", "class_id", "book_id", "order_qty", "status") VALUES (10, 3, 10, 30, '待采购');
+INSERT INTO t_order ("order_id", "class_id", "book_id", "order_qty", "status") VALUES (11, 4, 3, 45, '待采购');
+INSERT INTO t_order ("order_id", "class_id", "book_id", "order_qty", "status") VALUES (12, 4, 9, 45, '待采购');
+INSERT INTO t_order ("order_id", "class_id", "book_id", "order_qty", "status") VALUES (13, 4, 2, 45, '待采购');
+INSERT INTO t_order ("order_id", "class_id", "book_id", "order_qty", "status") VALUES (14, 5, 10, 50, '待采购');
+INSERT INTO t_order ("order_id", "class_id", "book_id", "order_qty", "status") VALUES (15, 5, 4, 50, '待采购');
+INSERT INTO t_order ("order_id", "class_id", "book_id", "order_qty", "status") VALUES (16, 5, 5, 50, '待采购');
+INSERT INTO t_order ("order_id", "class_id", "book_id", "order_qty", "status") VALUES (17, 1, 9, 20, '待采购');
+INSERT INTO t_order ("order_id", "class_id", "book_id", "order_qty", "status") VALUES (18, 2, 2, 15, '待采购');
+INSERT INTO t_order ("order_id", "class_id", "book_id", "order_qty", "status") VALUES (19, 3, 1, 10, '待采购');
+INSERT INTO t_order ("order_id", "class_id", "book_id", "order_qty", "status") VALUES (20, 4, 7, 10, '待采购');
+INSERT INTO t_order ("order_id", "class_id", "book_id", "order_qty", "status") VALUES (21, 1, 12, 1, '待采购');
+INSERT INTO t_order ("order_id", "class_id", "book_id", "order_qty", "status") VALUES (22, 2, 12, 1, '待采购');
+-- t_purchase: 11 rows
+INSERT INTO t_purchase ("purchase_id", "book_id", "purchase_qty", "purchase_date") VALUES (1, 1, 200, '2026-11-11 15:29:42');
+INSERT INTO t_purchase ("purchase_id", "book_id", "purchase_qty", "purchase_date") VALUES (2, 2, 150, '2026-11-11 15:29:42');
+INSERT INTO t_purchase ("purchase_id", "book_id", "purchase_qty", "purchase_date") VALUES (3, 3, 100, '2026-11-11 15:29:42');
+INSERT INTO t_purchase ("purchase_id", "book_id", "purchase_qty", "purchase_date") VALUES (4, 4, 120, '2026-11-11 15:29:42');
+INSERT INTO t_purchase ("purchase_id", "book_id", "purchase_qty", "purchase_date") VALUES (5, 5, 80, '2026-11-11 15:29:42');
+INSERT INTO t_purchase ("purchase_id", "book_id", "purchase_qty", "purchase_date") VALUES (6, 6, 60, '2026-11-11 15:29:42');
+INSERT INTO t_purchase ("purchase_id", "book_id", "purchase_qty", "purchase_date") VALUES (7, 7, 70, '2026-11-11 15:29:42');
+INSERT INTO t_purchase ("purchase_id", "book_id", "purchase_qty", "purchase_date") VALUES (8, 8, 50, '2026-11-11 15:29:42');
+INSERT INTO t_purchase ("purchase_id", "book_id", "purchase_qty", "purchase_date") VALUES (9, 9, 60, '2026-11-11 15:29:42');
+INSERT INTO t_purchase ("purchase_id", "book_id", "purchase_qty", "purchase_date") VALUES (10, 10, 90, '2026-11-11 15:29:42');
+INSERT INTO t_purchase ("purchase_id", "book_id", "purchase_qty", "purchase_date") VALUES (11, 12, 500, '2026-11-11 15:34:57');
+-- t_issue: 22 rows
+INSERT INTO t_issue ("issue_id", "order_id", "student_no", "issue_qty", "issue_date") VALUES (1, 1, '2023010101', 1, '2026-11-11 15:29:42');
+INSERT INTO t_issue ("issue_id", "order_id", "student_no", "issue_qty", "issue_date") VALUES (2, 1, '2023010102', 1, '2026-11-11 15:29:42');
+INSERT INTO t_issue ("issue_id", "order_id", "student_no", "issue_qty", "issue_date") VALUES (3, 1, '2023010103', 1, '2026-11-11 15:29:42');
+INSERT INTO t_issue ("issue_id", "order_id", "student_no", "issue_qty", "issue_date") VALUES (4, 2, '2023010101', 1, '2026-11-11 15:29:42');
+INSERT INTO t_issue ("issue_id", "order_id", "student_no", "issue_qty", "issue_date") VALUES (5, 2, '2023010102', 1, '2026-11-11 15:29:42');
+INSERT INTO t_issue ("issue_id", "order_id", "student_no", "issue_qty", "issue_date") VALUES (6, 5, '2023010201', 1, '2026-11-11 15:29:42');
+INSERT INTO t_issue ("issue_id", "order_id", "student_no", "issue_qty", "issue_date") VALUES (7, 5, '2023010202', 1, '2026-11-11 15:29:42');
+INSERT INTO t_issue ("issue_id", "order_id", "student_no", "issue_qty", "issue_date") VALUES (8, 8, '2023010301', 1, '2026-11-11 15:29:42');
+INSERT INTO t_issue ("issue_id", "order_id", "student_no", "issue_qty", "issue_date") VALUES (9, 8, '2023010302', 1, '2026-11-11 15:29:42');
+INSERT INTO t_issue ("issue_id", "order_id", "student_no", "issue_qty", "issue_date") VALUES (10, 8, '2023010303', 1, '2026-11-11 15:29:42');
+INSERT INTO t_issue ("issue_id", "order_id", "student_no", "issue_qty", "issue_date") VALUES (11, 11, '2023010401', 1, '2026-11-11 15:29:42');
+INSERT INTO t_issue ("issue_id", "order_id", "student_no", "issue_qty", "issue_date") VALUES (12, 11, '2023010402', 1, '2026-11-11 15:29:42');
+INSERT INTO t_issue ("issue_id", "order_id", "student_no", "issue_qty", "issue_date") VALUES (13, 14, '2023010501', 1, '2026-11-11 15:29:42');
+INSERT INTO t_issue ("issue_id", "order_id", "student_no", "issue_qty", "issue_date") VALUES (14, 21, '2023010101', 2, '2026-11-11 15:35:14');
+INSERT INTO t_issue ("issue_id", "order_id", "student_no", "issue_qty", "issue_date") VALUES (15, 21, '2023010102', 2, '2026-11-11 15:35:14');
+INSERT INTO t_issue ("issue_id", "order_id", "student_no", "issue_qty", "issue_date") VALUES (16, 21, '2023010103', 2, '2026-11-11 15:35:14');
+INSERT INTO t_issue ("issue_id", "order_id", "student_no", "issue_qty", "issue_date") VALUES (17, 21, '2023010104', 2, '2026-11-11 15:35:14');
+INSERT INTO t_issue ("issue_id", "order_id", "student_no", "issue_qty", "issue_date") VALUES (18, 21, '2023010105', 2, '2026-11-11 15:35:14');
+INSERT INTO t_issue ("issue_id", "order_id", "student_no", "issue_qty", "issue_date") VALUES (19, 22, '2023010201', 2, '2026-11-11 15:35:14');
+INSERT INTO t_issue ("issue_id", "order_id", "student_no", "issue_qty", "issue_date") VALUES (20, 22, '2023010202', 2, '2026-11-11 15:35:14');
+INSERT INTO t_issue ("issue_id", "order_id", "student_no", "issue_qty", "issue_date") VALUES (21, 22, '2023010203', 2, '2026-11-11 15:35:14');
+INSERT INTO t_issue ("issue_id", "order_id", "student_no", "issue_qty", "issue_date") VALUES (22, 22, '2023010204', 2, '2026-11-11 15:35:14');
+-- t_log: 7 rows
+INSERT INTO t_log ("log_id", "action", "detail", "log_time") VALUES (1, '退教材', '订单号1 学号2023010101 数量1', '2026-11-11 15:29:42');
+INSERT INTO t_log ("log_id", "action", "detail", "log_time") VALUES (2, '新增教材', '教材ID:11 《C语言》 供应商:陕西新华书店 单价:¥50 初始库存:20', '2026-11-11 15:30:23');
+INSERT INTO t_log ("log_id", "action", "detail", "log_time") VALUES (3, '新增教材', '教材ID:12 《大学体育》 供应商:陕西新华书店 单价:¥20 初始库存:50', '2026-11-11 15:34:18');
+INSERT INTO t_log ("log_id", "action", "detail", "log_time") VALUES (4, '教材征订', '《大学体育》 2本/班 共2个班：大数据2301、人工智能2301', '2026-11-11 15:34:36');
+INSERT INTO t_log ("log_id", "action", "detail", "log_time") VALUES (5, '采购入库', '《大学体育》 500本 单价:¥20.00 总额:¥10000.00', '2026-11-11 15:34:57');
+INSERT INTO t_log ("log_id", "action", "detail", "log_time") VALUES (6, '批量发放', '《大学体育》 共9人 2本/人：大数据2301(5人)、人工智能2301(4人)', '2026-11-11 15:35:14');
+INSERT INTO t_log ("log_id", "action", "detail", "log_time") VALUES (7, '批量退订', '《大学体育》 2个班 共退2本：大数据2301(1本)、人工智能2301(1本)', '2026-11-11 15:35:38');
+COMMIT;
